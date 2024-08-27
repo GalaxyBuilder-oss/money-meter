@@ -8,6 +8,7 @@ import java.util.List;
 public interface TransactionDataService {
 
     List<TransactionDataResponseDto> getAll();
+    List<TransactionDataResponseDto> getAllByUserEmail(String email);
     TransactionDataResponseDto add(TransactionDataRequestDto dto);
     TransactionDataResponseDto update(Long id, TransactionDataRequestDto dto);
     void delete(Long id);

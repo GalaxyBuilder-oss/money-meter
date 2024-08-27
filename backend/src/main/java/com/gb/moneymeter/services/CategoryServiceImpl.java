@@ -6,6 +6,7 @@ import com.gb.moneymeter.entities.Category;
 import com.gb.moneymeter.entities.UserData;
 import com.gb.moneymeter.repositories.CategoryRepository;
 import com.gb.moneymeter.repositories.UserRepository;
+import com.gb.moneymeter.utils.HashUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,17 @@ public class CategoryServiceImpl implements CategoryService {
 
             return repository.findAll().stream().map(this::modelToDto).toList();
         } catch (Error e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error In System");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something Error");
+        }
+    }
+
+    @Override
+    public List<CategoryResponseDto> getAllByUserEmail(String email) {
+        try {
+
+            return repository.findCategoryByUserEmail(email).stream().map(this::modelToDto).toList();
+        } catch (Error e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something Error");
         }
     }
 
@@ -43,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponseDto add(CategoryRequestDto dto) {
         try {
             UserData userData = userRepository.findById(dto.getUserId()).orElse(null);
-            if (userData == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not Found");
+            if (userData == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found");
             Category model = repository.save(new Category(null, dto.getName(), dto.getDescription(), LocalDate.now(), LocalDate.now(), null, userData));
             userData.setCategoryList(repository.findAll().stream().filter(category -> category.getUserDataId().equals(userData)).toList());
             return new CategoryResponseDto(model.getId(), model.getName(), model.getDescription(), model.getCreatedAt(), model.getUpdatedAt());
@@ -56,7 +67,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponseDto update(Long id, CategoryRequestDto dto) {
         try {
             Category model = repository.findById(id).orElse(null);
-            if (model == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Category Not Found");
+            if (model == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category Not Found");
 
             model.setName(dto.getName());
             model.setDescription(dto.getDescription());
@@ -71,9 +82,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void delete(Long id) {
         try {
+
             repository.deleteById(id);
         } catch (Error e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id Not Found");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something Error");
         }
     }
 }

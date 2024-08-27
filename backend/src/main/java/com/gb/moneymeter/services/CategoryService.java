@@ -8,6 +8,7 @@ import java.util.List;
 public interface CategoryService {
 
     List<CategoryResponseDto> getAll();
+    List<CategoryResponseDto> getAllByUserEmail(String email);
     CategoryResponseDto add(CategoryRequestDto dto);
     CategoryResponseDto update(Long id, CategoryRequestDto dto);
     void delete(Long id);

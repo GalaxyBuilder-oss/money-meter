@@ -5,6 +5,7 @@ import com.gb.moneymeter.dto.GeneralResponses;
 import com.gb.moneymeter.dto.LoginRequestDto;
 import com.gb.moneymeter.dto.user.UserRequestDto;
 import com.gb.moneymeter.services.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +34,11 @@ public class AuthController {
             return ResponseEntity.badRequest().body(GeneralResponses.error(e.getMessage()));
         } catch (Error e) {
             log.error(e.getMessage());
-            return ResponseEntity.internalServerError().body(GeneralResponses.error("Problem In Our System"));
+            return ResponseEntity.internalServerError().body(GeneralResponses.error(MessagesConstant.INTERNAL_ERROR));
         }
     }
 
+    @SecurityRequirement(name = "Bearer Authentication")
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody UserRequestDto dto) {
         try {
@@ -46,8 +48,9 @@ public class AuthController {
 
             return ResponseEntity.badRequest().body(GeneralResponses.error(e.getMessage()));
         } catch (Error e) {
+
             log.error(e.getMessage());
-            return ResponseEntity.internalServerError().body(GeneralResponses.error("Problem In Our System"));
+            return ResponseEntity.internalServerError().body(GeneralResponses.error(MessagesConstant.INTERNAL_ERROR));
         }
     }
 
@@ -62,7 +65,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(GeneralResponses.error(e.getMessage()));
         } catch (Error e) {
             log.error(e.getMessage());
-            return ResponseEntity.internalServerError().body(GeneralResponses.error("Problem In Our System"));
+            return ResponseEntity.internalServerError().body(GeneralResponses.error(MessagesConstant.INTERNAL_ERROR));
         }
     }
 

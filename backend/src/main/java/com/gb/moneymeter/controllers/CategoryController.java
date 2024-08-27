@@ -34,7 +34,22 @@ public class CategoryController {
             return ResponseEntity.badRequest().body(GeneralResponses.error(e.getMessage()));
         } catch (Error e) {
             log.error(e.getMessage());
-            return ResponseEntity.internalServerError().body(GeneralResponses.error("Problem In Our System"));
+            return ResponseEntity.internalServerError().body(GeneralResponses.error(MessagesConstant.INTERNAL_ERROR));
+        }
+    }
+    @SecurityRequirement(name = "Bearer Authentication")
+    @GetMapping("/by-email")
+    public ResponseEntity<Object> getAllByUserEmail(@RequestParam String email) {
+
+        try {
+
+            return ResponseEntity.ok().body(GeneralResponses.success(service.getAllByUserEmail(email), MessagesConstant.SUCCESS));
+        } catch (ResponseStatusException e) {
+
+            return ResponseEntity.badRequest().body(GeneralResponses.error(e.getMessage()));
+        } catch (Error e) {
+            log.error(e.getMessage());
+            return ResponseEntity.internalServerError().body(GeneralResponses.error(MessagesConstant.INTERNAL_ERROR));
         }
     }
 
@@ -50,7 +65,7 @@ public class CategoryController {
             return ResponseEntity.badRequest().body(GeneralResponses.error(e.getMessage()));
         } catch (Error e) {
             log.error(e.getMessage());
-            return ResponseEntity.internalServerError().body(GeneralResponses.error("Problem In Our System"));
+            return ResponseEntity.internalServerError().body(GeneralResponses.error(MessagesConstant.INTERNAL_ERROR));
         }
     }
 
@@ -66,7 +81,7 @@ public class CategoryController {
             return ResponseEntity.badRequest().body(GeneralResponses.error(e.getMessage()));
         } catch (Error e) {
             log.error(e.getMessage());
-            return ResponseEntity.internalServerError().body(GeneralResponses.error("Problem In Our System"));
+            return ResponseEntity.internalServerError().body(GeneralResponses.error(MessagesConstant.INTERNAL_ERROR));
         }
     }
 
@@ -82,7 +97,7 @@ public class CategoryController {
             return ResponseEntity.badRequest().body(GeneralResponses.error(e.getMessage()));
         } catch (Error e) {
             log.error(e.getMessage());
-            return ResponseEntity.internalServerError().body(GeneralResponses.error("Problem In Our System"));
+            return ResponseEntity.internalServerError().body(GeneralResponses.error(MessagesConstant.INTERNAL_ERROR));
         }
     }
 }

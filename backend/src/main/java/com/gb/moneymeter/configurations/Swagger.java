@@ -27,20 +27,21 @@ public class Swagger {
 
         Contact contact = new Contact()
                 .email("galaxybuilder.oss@gmail.com")
-                .name("Contact Support");
+                .name("Support");
 
         License license = new License()
-                .name("MIT Licensi")
+                .name("MIT License")
                 .url("http://www.mit-test.com");
 
         Info info = new Info()
                 .title("Money Meter")
                 .version("1.0")
-                .description("Money Metter")
+                .description("Money Meter")
                 .contact(contact)
                 .termsOfService("tos")
                 .license(license)
-                .summary("Money Metter");
+                .summary("Money Meter");
+
         SecurityScheme securityScheme = new SecurityScheme().type(SecurityScheme.Type.HTTP)
                 .bearerFormat("JWT")
                 .scheme("bearer");

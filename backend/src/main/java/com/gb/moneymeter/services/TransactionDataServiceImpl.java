@@ -37,6 +37,16 @@ public class TransactionDataServiceImpl implements TransactionDataService {
         }
     }
 
+    @Override
+    public List<TransactionDataResponseDto> getAllByUserEmail(String email) {
+        try {
+
+            return transactionRepository.getTransactionByUserEmail(email).stream().map(this::modelToDto).toList();
+        } catch (Error e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
     private TransactionDataResponseDto modelToDto(TransactionData transactionData) {
         return new TransactionDataResponseDto(transactionData.getId(), transactionData.getTransactionValue(), transactionData.getUserDataId(), transactionData.getDescription(), transactionData.getDate(), transactionData.getTransactionType(), transactionData.getIdCategory());
     }
@@ -46,7 +56,7 @@ public class TransactionDataServiceImpl implements TransactionDataService {
         try {
             TransactionData model = new TransactionData();
             UserData userData = userRepository.findById(dto.getIdUser()).orElse(null);
-            if (userData == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not Found");
+            if (userData == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found");
             Long balance = userData.getBalance();
             if (dto.getTransactionType().equalsIgnoreCase(TransactionType.DEBIT)) {
                 balance += dto.getTransactionValue();
@@ -59,14 +69,9 @@ public class TransactionDataServiceImpl implements TransactionDataService {
             model.setDescription(dto.getDescription());
             model.setDate(dto.getDate());
             model.setTransactionType(dto.getTransactionType());
-            model.setIdCategory(categoryRepository.findById(dto.getIdCategory()).orElse(null));
-            TransactionDataResponseDto responseDto = modelToDto(transactionRepository.save(model));
-
-            userData.setTransactionDataList(transactionRepository.findAll().stream().filter(transactionData -> transactionData.getUserDataId().equals(userData)).toList());
-            userRepository.save(userData);
-            return responseDto;
+            return modelToDto(transactionRepository.save(model));
         } catch (Error e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something Error");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something Error");
         }
     }
 
@@ -74,10 +79,8 @@ public class TransactionDataServiceImpl implements TransactionDataService {
     public TransactionDataResponseDto update(Long id, TransactionDataRequestDto dto) {
         TransactionData model = transactionRepository.findById(id).orElse(null);
         try {
-            if (model == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction Not Found");
+            if (model == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction Not Found");
             model.setDescription(dto.getDescription());
-            if (dto.getIdCategory() != 0L)
-                model.setIdCategory(categoryRepository.findById(dto.getIdCategory()).orElse(null));
             model.setDate(dto.getDate());
             return modelToDto(transactionRepository.save(model));
         } catch (Error e) {
@@ -90,7 +93,7 @@ public class TransactionDataServiceImpl implements TransactionDataService {
         try {
             transactionRepository.deleteById(id);
         } catch (Error e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction Not Found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction Not Found");
         }
     }
 }

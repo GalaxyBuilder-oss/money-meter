@@ -1,5 +1,6 @@
 package com.gb.moneymeter.controllers;
 
+import com.gb.moneymeter.constants.MessagesConstant;
 import com.gb.moneymeter.dto.GeneralResponses;
 import com.gb.moneymeter.dto.transaction.TransactionDataRequestDto;
 import com.gb.moneymeter.services.TransactionDataService;
@@ -27,13 +28,29 @@ public class TransactionDataController {
 
         try {
 
-            return ResponseEntity.ok().body(GeneralResponses.success(transactionDataService.getAll(), "success"));
+            return ResponseEntity.ok().body(GeneralResponses.success(transactionDataService.getAll(), MessagesConstant.SUCCESS);
         } catch (ResponseStatusException e) {
 
             return ResponseEntity.badRequest().body(GeneralResponses.error(e.getMessage()));
         } catch (Error e) {
             log.error(e.getMessage());
-            return ResponseEntity.internalServerError().body(GeneralResponses.error("Problem In Our System"));
+            return ResponseEntity.internalServerError().body(GeneralResponses.error(MessagesConstant.INTERNAL_ERROR));
+        }
+    }
+
+    @SecurityRequirement(name = "Bearer Authentication")
+    @GetMapping("/by-email")
+    public ResponseEntity<Object> getAllByEmail(@RequestParam String email) {
+
+        try {
+
+            return ResponseEntity.ok().body(GeneralResponses.success(transactionDataService.getAll(), MessagesConstant.SUCCESS);
+        } catch (ResponseStatusException e) {
+
+            return ResponseEntity.badRequest().body(GeneralResponses.error(e.getMessage()));
+        } catch (Error e) {
+            log.error(e.getMessage());
+            return ResponseEntity.internalServerError().body(GeneralResponses.error(MessagesConstant.INTERNAL_ERROR));
         }
     }
 
@@ -49,7 +66,7 @@ public class TransactionDataController {
             return ResponseEntity.badRequest().body(GeneralResponses.error(e.getMessage()));
         } catch (Error e) {
             log.error(e.getMessage());
-            return ResponseEntity.internalServerError().body(GeneralResponses.error("Problem In Our System"));
+            return ResponseEntity.internalServerError().body(GeneralResponses.error(MessagesConstant.INTERNAL_ERROR));
         }
     }
 }

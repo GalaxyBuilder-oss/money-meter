@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -32,8 +34,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto register(UserRequestDto dto) {
         if (userRepository.findAll().stream().anyMatch(data -> HashUtil.compareStringToHash(dto.getEmail(), data.getHashEmail())))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Use Different Email For Register");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email Was Registered, Use Different Email For Register");
         try {
+
             UserData userData = new UserData(null, dto.getName(), dto.getGender(), dto.getBalance(), null, null, dto.getPassword(), null, null, null, null, null);
             userData.setJoinAt(LocalDate.now());
             userData.setHashEmail(HashUtil.hashString(dto.getEmail()));
@@ -59,12 +62,14 @@ public class UserServiceImpl implements UserService {
         UserData user = userRepository.findById(id).orElse(null);
         try {
 
-            if (user == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not Found");
+            if (user == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found");
+            if (!passwordEncoder.matches(dto.getPassword(), user.getPassword()))
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password Incorrect");
+
             user.setName(dto.getName());
-            if (HashUtil.compareStringToHash(dto.getEmail(), user.getHashEmail())) {
-                user.setHashEmail(HashUtil.hashString(dto.getEmail()));
-            }
+            user.setGender(dto.getGender());
             user.setBalance(dto.getBalance());
+            user.setLastUpdated(LocalDate.now());
             return modelToDto(userRepository.save(user));
         } catch (Error e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error In Our System");
@@ -75,12 +80,10 @@ public class UserServiceImpl implements UserService {
     public void delete(Long id) {
         try {
 
-            if (id == 0 || id.describeConstable().isEmpty())
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id Cannot 0 or Empty");
             userRepository.deleteById(id);
         } catch (Error e) {
 
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error in our system");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something Error");
         }
     }
 
@@ -88,10 +91,16 @@ public class UserServiceImpl implements UserService {
     public LoginResponseDto login(LoginRequestDto dto) {
         try {
             UserData userData = userRepository.findAll().stream().filter(user -> HashUtil.compareStringToHash(dto.getEmail(), user.getHashEmail()) && passwordEncoder.matches(dto.getPassword(), user.getPassword())).findAny().orElse(null);
-            if (userData == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not Found");
+            if (userData == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found");
+            List<LocalDate> dates = userData.getLastLogin() == null ? new ArrayList<>() : userData.getLastLogin();
+            if (dates.stream().noneMatch(date -> date.equals(LocalDate.now()))) {
+                dates.add(LocalDate.now());
+                userData.setLastLogin(dates);
+                userRepository.save(userData);
+            }
             return new LoginResponseDto(emailConvert(dto.getEmail()), jwtUtil.generateToken(userData));
         } catch (Error e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 }
