@@ -17,6 +17,18 @@ module.exports = {
       },
     },
     extend: {
+      colors: {
+        light: {
+          bg: '#ffffff',
+          text: '#030712',
+        },
+        dark: {
+          bg: '#030712',
+          title: '#ffffff',
+          link: '#ffffff',
+          text: '#6b7280',
+        },
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },

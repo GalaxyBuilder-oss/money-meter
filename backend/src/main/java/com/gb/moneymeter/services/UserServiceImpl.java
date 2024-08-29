@@ -10,7 +10,6 @@ import com.gb.moneymeter.repositories.UserRepository;
 import com.gb.moneymeter.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -98,7 +97,7 @@ public class UserServiceImpl implements UserService {
                 userData.setLastLogin(dates);
                 userRepository.save(userData);
             }
-            return new LoginResponseDto(emailConvert(dto.getEmail()), jwtUtil.generateToken(userData));
+            return new LoginResponseDto(userData.getName(), jwtUtil.generateToken(userData));
         } catch (Error e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }

@@ -14,7 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Tag(name = "Category")
 @Slf4j
-@CrossOrigin(origins = {"http://localhost:5173","*"})
+@CrossOrigin(origins = {"http://localhost:5173","http://money-meter.vercel.app"})
 @RestController
 @RequestMapping("/api/category")
 public class CategoryController {

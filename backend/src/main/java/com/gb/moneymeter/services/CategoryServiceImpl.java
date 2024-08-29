@@ -6,7 +6,6 @@ import com.gb.moneymeter.entities.Category;
 import com.gb.moneymeter.entities.UserData;
 import com.gb.moneymeter.repositories.CategoryRepository;
 import com.gb.moneymeter.repositories.UserRepository;
-import com.gb.moneymeter.utils.HashUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -53,10 +52,15 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponseDto add(CategoryRequestDto dto) {
         try {
+
+            if (repository.findAll().stream().anyMatch(category -> category.getName().equalsIgnoreCase(dto.getName()) && category.getUserDataId().getId().equals(dto.getUserId())))
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Category Is Exist, Please Change It");
             UserData userData = userRepository.findById(dto.getUserId()).orElse(null);
             if (userData == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found");
-            Category model = repository.save(new Category(null, dto.getName(), dto.getDescription(), LocalDate.now(), LocalDate.now(), null, userData));
-            userData.setCategoryList(repository.findAll().stream().filter(category -> category.getUserDataId().equals(userData)).toList());
+            if (dto.getName().isEmpty() || dto.getName().isBlank())
+                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Name Must Be Included");
+
+            Category model = repository.save(new Category(null, dto.getName(), dto.getDescription(), LocalDate.now(), null, null, userData));
             return new CategoryResponseDto(model.getId(), model.getName(), model.getDescription(), model.getCreatedAt(), model.getUpdatedAt());
         } catch (Error e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error Adding Category");
@@ -68,9 +72,12 @@ public class CategoryServiceImpl implements CategoryService {
         try {
             Category model = repository.findById(id).orElse(null);
             if (model == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category Not Found");
+            if (dto.getName().isBlank() || dto.getName().isEmpty())
+                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Name Cannot Empty");
 
             model.setName(dto.getName());
-            model.setDescription(dto.getDescription());
+            if (!dto.getDescription().isBlank() || !dto.getDescription().isEmpty())
+                model.setDescription(dto.getDescription());
             model.setUpdatedAt(LocalDate.now());
             Category temp = repository.save(model);
             return new CategoryResponseDto(temp.getId(), temp.getName(), temp.getDescription(), temp.getCreatedAt(), temp.getUpdatedAt());

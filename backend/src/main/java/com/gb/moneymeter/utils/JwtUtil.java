@@ -24,7 +24,7 @@ public class JwtUtil {
         claims.put("email", user.getHashEmail());
 
         Date tokenCreateTime = new Date();
-        long accessTokenValidity = 60L * 60L * 1000L;
+        long accessTokenValidity = 60L * 60L * 1000L; // 1 Hari
         Date tokenValidity = new Date(tokenCreateTime.getTime() +
                 TimeUnit.MINUTES.toMillis(accessTokenValidity));
 

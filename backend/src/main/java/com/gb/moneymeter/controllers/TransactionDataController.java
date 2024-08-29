@@ -14,7 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Tag(name = "Transaction")
 @Slf4j
-@CrossOrigin(origins = {"http://localhost:5173","*"})
+@CrossOrigin(origins = {"http://localhost:5173","http://money-meter.vercel.app"})
 @RestController
 @RequestMapping("/api/transaction")
 public class TransactionDataController {
@@ -28,7 +28,7 @@ public class TransactionDataController {
 
         try {
 
-            return ResponseEntity.ok().body(GeneralResponses.success(transactionDataService.getAll(), MessagesConstant.SUCCESS);
+            return ResponseEntity.ok().body(GeneralResponses.success(transactionDataService.getAll(), MessagesConstant.SUCCESS));
         } catch (ResponseStatusException e) {
 
             return ResponseEntity.badRequest().body(GeneralResponses.error(e.getMessage()));
@@ -44,7 +44,7 @@ public class TransactionDataController {
 
         try {
 
-            return ResponseEntity.ok().body(GeneralResponses.success(transactionDataService.getAll(), MessagesConstant.SUCCESS);
+            return ResponseEntity.ok().body(GeneralResponses.success(transactionDataService.getAll(), MessagesConstant.SUCCESS));
         } catch (ResponseStatusException e) {
 
             return ResponseEntity.badRequest().body(GeneralResponses.error(e.getMessage()));
