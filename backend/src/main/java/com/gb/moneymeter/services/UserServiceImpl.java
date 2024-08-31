@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email Was Registered, Use Different Email For Register");
         try {
 
-            UserData userData = new UserData(null, dto.getName(), dto.getGender(), dto.getBalance(), null, null, dto.getPassword(), null, null, null, null, null);
+            UserData userData = new UserData(null, dto.getName(), dto.getGender(), null, null, dto.getPassword(), null, null, null, null, null, null);
             userData.setJoinAt(LocalDate.now());
             userData.setHashEmail(HashUtil.hashString(dto.getEmail()));
             userData.setEmailDomain(emailConvert(dto.getEmail()));
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserResponseDto modelToDto(UserData model) {
-        return new UserResponseDto(model.getId(), model.getName(), model.getGender(), model.getBalance(), model.getHashEmail(), model.getEmailDomain(), model.getPassword(), model.getJoinAt(), model.getLastUpdated(), model.getLastLogin());
+        return new UserResponseDto(model.getId(), model.getName(), model.getGender(), model.getHashEmail(), model.getEmailDomain(), model.getPassword(), model.getJoinAt(), model.getLastUpdated(), model.getLastLogin(), model.getColor());
     }
 
     @Override
@@ -67,7 +67,6 @@ public class UserServiceImpl implements UserService {
 
             user.setName(dto.getName());
             user.setGender(dto.getGender());
-            user.setBalance(dto.getBalance());
             user.setLastUpdated(LocalDate.now());
             return modelToDto(userRepository.save(user));
         } catch (Error e) {
@@ -101,5 +100,10 @@ public class UserServiceImpl implements UserService {
         } catch (Error e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
+    }
+
+    @Override
+    public UserResponseDto getByEmail(String email) {
+        return userRepository.findAll().stream().filter(user -> user.getHashEmail().equalsIgnoreCase(email)).map(this::modelToDto).findFirst().orElse(null);
     }
 }

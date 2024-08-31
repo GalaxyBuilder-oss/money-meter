@@ -3,6 +3,7 @@ package com.gb.moneymeter.services;
 import com.gb.moneymeter.constants.TransactionType;
 import com.gb.moneymeter.dto.transaction.TransactionDataRequestDto;
 import com.gb.moneymeter.dto.transaction.TransactionDataResponseDto;
+import com.gb.moneymeter.entities.Category;
 import com.gb.moneymeter.entities.TransactionData;
 import com.gb.moneymeter.entities.UserData;
 import com.gb.moneymeter.repositories.CategoryRepository;
@@ -57,17 +58,11 @@ public class TransactionDataServiceImpl implements TransactionDataService {
             TransactionData model = new TransactionData();
             UserData userData = userRepository.findById(dto.getIdUser()).orElse(null);
             if (userData == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found");
-            Long balance = userData.getBalance();
-            if (dto.getTransactionType().equalsIgnoreCase(TransactionType.DEBIT)) {
-                balance += dto.getTransactionValue();
-            } else if (dto.getTransactionType().equalsIgnoreCase(TransactionType.CREDIT)) {
-                balance -= dto.getTransactionValue();
-            } else throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction Type Invalid");
-            userData.setBalance(balance);
             model.setUserDataId(userData);
             model.setTransactionValue(dto.getTransactionValue());
             model.setDescription(dto.getDescription());
             model.setDate(dto.getDate());
+            model.setIdCategory(new Category(dto.getIdCategory()));
             model.setTransactionType(dto.getTransactionType());
             return modelToDto(transactionRepository.save(model));
         } catch (Error e) {

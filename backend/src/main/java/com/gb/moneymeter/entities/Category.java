@@ -1,5 +1,6 @@
 package com.gb.moneymeter.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,10 +27,15 @@ public class Category {
 
     private LocalDate updatedAt;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "idCategory")
     private List<TransactionData> transactionDataList;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private UserData userDataId;
+
+    public Category(Long idCategory) {
+        this.id = idCategory;
+    }
 }

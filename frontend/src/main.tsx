@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App.tsx";
 import "./index.css";
-import { Category, Home, Tests, Transaction, Report } from "./pages";
+import { CategoryPage, Home, Profile, ReportPage, Tests, TransactionPage } from "./pages";
 
 const router = createBrowserRouter([
   {
@@ -16,23 +16,27 @@ const router = createBrowserRouter([
       },
       {
         path: "/transaction/add",
-        element: <Transaction defaultValue="create" />,
+        element: <TransactionPage defaultValue="create" />,
       },
       {
         path: "/transaction",
-        element: <Transaction defaultValue="see" />,
+        element: <TransactionPage defaultValue="see" />,
       },
       {
         path: "/category/add",
-        element: <Category defaultValue="create" />,
+        element: <CategoryPage defaultValue="create" />,
       },
       {
         path: "/category",
-        element: <Category defaultValue="see" />,
+        element: <CategoryPage defaultValue="see" />,
       },
       {
         path: "/report",
-        element: <Report />,
+        element: <ReportPage />,
+      },
+      {
+        path: "/profile",
+        element: <Profile />,
       },
       {
         path: "/tes",

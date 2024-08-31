@@ -8,7 +8,6 @@ public class UserRequestDto {
     private String name;
     private String gender;
     private String email;
-    private Long Balance;
     private String password;
-
+    private String color;
 }

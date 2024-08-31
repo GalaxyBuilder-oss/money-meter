@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.gb</groupId>
 	<artifactId>moneymeter</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>Money Meter</name>
 	<description>Hitung Pemasukan Serta Pengeluaran Anda Agar Dapat Terkendali</description>
 	<url/>

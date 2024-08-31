@@ -1,3 +1,5 @@
+import { apiTransaction } from "@/api";
+import { useAppContext } from "@/components";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -17,8 +19,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { Transaction } from "@/types";
+import { Trash2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
@@ -31,21 +43,25 @@ type FormValues = {
   idCategory: number;
 };
 
-const TransactionAdd = ({ defaultValue }: { defaultValue: string }) => {
-  const [categories, setCategories] = useState<{ id: number; name: string }[]>(
-    []
-  );
+const TransactionPage = ({ defaultValue }: { defaultValue: string }) => {
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [minValue, setMinValue] = useState<number>(0);
   const [maxValue, setMaxValue] = useState<number>(0);
+  const {
+    user,
+    formatter,
+    categories,
+    transactions,
+    fetchTransactions,
+    fetchCategories,
+  } = useAppContext();
 
   useEffect(() => {
     setMinValue(1000);
     setMaxValue(() => 9 + 5);
-    setCategories([
-      { id: 1, name: "Piutang" },
-      { id: 2, name: "Ada" },
-    ]);
-  }, []);
+    fetchTransactions();
+    fetchCategories();
+  }, [setMinValue, fetchTransactions, fetchCategories]);
 
   const form = useForm<FormValues>({
     defaultValues: {
@@ -57,7 +73,7 @@ const TransactionAdd = ({ defaultValue }: { defaultValue: string }) => {
     },
   });
 
-  function onSubmit(values: FormValues) {
+  async function onSubmit(values: FormValues) {
     const errors: Record<string, string> = {};
 
     const parsedValue = parseTransactionValue(values.transactionValue);
@@ -72,12 +88,16 @@ const TransactionAdd = ({ defaultValue }: { defaultValue: string }) => {
       errors.idCategory = "Kategori Harus Dipilih";
     }
     if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       console.error(errors);
       return;
     }
 
-    const userId = 123; // Simpan User ID di sini
-    console.log({ ...values, transactionValue: parsedValue, userId });
+    const idUser = user?.id as number; // Simpan User ID di sini
+    await apiTransaction
+      .add({ ...values, transactionValue: parsedValue, idUser })
+      .then((res) => console.log(res));
+    form.reset()
   }
 
   function parseTransactionValue(value: string): number {
@@ -85,15 +105,8 @@ const TransactionAdd = ({ defaultValue }: { defaultValue: string }) => {
     return isNaN(numericValue) ? 0 : numericValue;
   }
 
-  const formatter = new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  });
-
   return (
-    <Tabs defaultValue={defaultValue} className="w-[400px] flex flex-col">
+    <Tabs defaultValue={defaultValue} className="w-[80vw] flex flex-col">
       <TabsList className="w-full flex justify-around">
         <TabsTrigger value="create" asChild>
           <Link to="/transaction/add">Tambah Transaksi</Link>
@@ -102,7 +115,7 @@ const TransactionAdd = ({ defaultValue }: { defaultValue: string }) => {
           <Link to="/transaction">Lihat Transaksi</Link>
         </TabsTrigger>
       </TabsList>
-      <TabsContent value="create">
+      <TabsContent value="create" className="dark:text-dark-title">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -130,7 +143,9 @@ const TransactionAdd = ({ defaultValue }: { defaultValue: string }) => {
                     />
                   </FormControl>
                   <FormDescription>Masukkan Nilai Transaksi</FormDescription>
-                  <FormMessage />
+                  {formErrors.transactionValue && (
+                    <FormMessage>{formErrors.transactionValue}</FormMessage>
+                  )}
                 </FormItem>
               )}
             />
@@ -149,7 +164,9 @@ const TransactionAdd = ({ defaultValue }: { defaultValue: string }) => {
                   <FormDescription>
                     Berikan Keterangan Untuk Transaksi.
                   </FormDescription>
-                  <FormMessage />
+                  {formErrors.description && (
+                    <FormMessage>{formErrors.description}</FormMessage>
+                  )}
                 </FormItem>
               )}
             />
@@ -165,7 +182,9 @@ const TransactionAdd = ({ defaultValue }: { defaultValue: string }) => {
                   <FormDescription>
                     Pilih Tanggal Transaksi Dilakukan
                   </FormDescription>
-                  <FormMessage />
+                  {formErrors.date && (
+                    <FormMessage>{formErrors.date}</FormMessage>
+                  )}
                 </FormItem>
               )}
             />
@@ -195,7 +214,9 @@ const TransactionAdd = ({ defaultValue }: { defaultValue: string }) => {
                       </FormItem>
                     </RadioGroup>
                   </FormControl>
-                  <FormMessage />
+                  {formErrors.transactionType && (
+                    <FormMessage>{formErrors.transactionType}</FormMessage>
+                  )}
                 </FormItem>
               )}
             />
@@ -214,21 +235,24 @@ const TransactionAdd = ({ defaultValue }: { defaultValue: string }) => {
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
                       <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem
-                            key={category.id}
-                            value={category.id.toString()}
-                          >
-                            {category.name}
-                          </SelectItem>
-                        ))}
+                        {categories &&
+                          categories.map((category) => (
+                            <SelectItem
+                              key={category.id}
+                              value={category.id.toString()}
+                            >
+                              {category.name}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </FormControl>
                   <FormDescription>
                     Pilih Kategori/Akun Untuk Transaksi Ini
                   </FormDescription>
-                  <FormMessage />
+                  {formErrors.idCategory && (
+                    <FormMessage>{formErrors.idCategory}</FormMessage>
+                  )}
                 </FormItem>
               )}
             />
@@ -236,9 +260,45 @@ const TransactionAdd = ({ defaultValue }: { defaultValue: string }) => {
           </form>
         </Form>
       </TabsContent>
-      <TabsContent value="see">Make changes to your account here.</TabsContent>
+      <TabsContent value="see">
+        <Table className="capitalize dark:text-dark-title">
+          <TableHeader>
+            <TableRow>
+              <TableHead>NO</TableHead>
+              <TableHead>Keterangan</TableHead>
+              <TableHead>Nilai Transaksi</TableHead>
+              <TableHead>Tipe Transaksi</TableHead>
+              <TableHead>Kategori</TableHead>
+              <TableHead>Tanggal</TableHead>
+              <TableHead>Aksi</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {transactions &&
+              transactions.map((transaction: Transaction, i: number) => (
+                <TableRow key={transaction.id}>
+                  <TableCell>{i + 1}</TableCell>
+                  <TableCell>{transaction.description}</TableCell>
+                  <TableCell>
+                    {formatter.format(transaction.transactionValue)}
+                  </TableCell>
+                  <TableCell>{transaction.transactionType}</TableCell>
+                  <TableCell>{transaction.idCategory?.name}</TableCell>
+                  <TableCell>
+                    {new Date(transaction.date).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <Button>
+                      <Trash2Icon />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </TabsContent>
     </Tabs>
   );
 };
 
-export default TransactionAdd;
+export default TransactionPage;

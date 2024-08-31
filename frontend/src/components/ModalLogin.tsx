@@ -1,22 +1,22 @@
-import { api } from "@/api";
+import { apiAuth } from "@/api";
 import { LoginData } from "@/types";
 import { useForm } from "react-hook-form";
-import Cookies from "universal-cookie";
+import { useAppContext } from "./auth/useAppContext";
 import { Button } from "./ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogOverlay,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogOverlay,
+  DialogTitle,
 } from "./ui/dialog";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
 
@@ -29,6 +29,7 @@ const LoginModal = ({
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   toggleLoginModal: () => void;
 }) => {
+  const { handleLogin } = useAppContext();
   const form = useForm<LoginData>({
     defaultValues: {
       email: "",
@@ -37,16 +38,15 @@ const LoginModal = ({
   });
 
   const onSubmit = async (values: LoginData) => {
-    const cookies = new Cookies()
+
     try {
-      const res = await api.login(values).then((result) => result.json());
+      const res = await apiAuth.login(values);
 
       console.log("Login Data: ", res);
-      if (res.ok) {
-        cookies.set("token", res.data.token)
-        // toggleLoginModal()
-        // location.reload();
-      } else throw new Error(res.responseMessage);
+      if (res.data.ok) {
+        handleLogin(res.data.data.token);
+        toggleLoginModal();
+      } else throw new Error(JSON.stringify(res));
     } catch (error) {
       console.error(error);
     }
@@ -56,7 +56,7 @@ const LoginModal = ({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogOverlay className="fixed bg-black bg-opacity-30 transition-opacity duration-300" />
       <DialogContent
-        className="w-1/2 fixed flex flex-col items-center justify-center transition-opacity duration-300"
+        className="w-1/2 fixed flex flex-col items-center justify-center transition-opacity duration-300 dark:text-dark-title"
         aria-label="Login Modal"
       >
         <DialogHeader>

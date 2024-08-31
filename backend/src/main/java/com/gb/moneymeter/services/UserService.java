@@ -10,4 +10,6 @@ public interface UserService {
     UserResponseDto update(Long id, UserRequestDto dto);
     void delete(Long id);
     LoginResponseDto login(LoginRequestDto dto);
+
+    UserResponseDto getByEmail(String email);
 }

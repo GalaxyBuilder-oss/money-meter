@@ -1,6 +1,9 @@
 import { cn } from "@/lib/utils";
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useAppContext } from "./auth/useAppContext";
+import LoginModal from "./ModalLogin";
+import RegisterModal from "./RegisterModal";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
   DropdownMenu,
@@ -19,8 +22,6 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "./ui/navigation-menu";
-import RegisterModal from "./RegisterModal";
-import LoginModal from "./ModalLogin";
 
 const components: {
   title: string;
@@ -55,6 +56,7 @@ const components: {
 ];
 
 const Header = () => {
+  const { user, handleLogout } = useAppContext();
   const [isLoginOpen, setLoginOpen] = useState(false);
   const [isSignupOpen, setSignupOpen] = useState(false);
   const location = useLocation();
@@ -76,27 +78,29 @@ const Header = () => {
               </Link>
             </NavigationMenuLink>
           </NavigationMenuItem>
-          <NavigationMenuItem>
-            <NavigationMenuTrigger className={navigationMenuTriggerStyle()}>
-              Menu
-            </NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <ul className="grid w-[98vw] gap-3 p-4 sm:w-[26vw] sm:grid-cols-2">
-                {components.map(
-                  (component) =>
-                    !isActive(component.group) && (
-                      <ListItem
-                        key={component.title}
-                        title={component.title}
-                        href={component.href}
-                      >
-                        {component.description}
-                      </ListItem>
-                    )
-                )}
-              </ul>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
+          {user && (
+            <NavigationMenuItem>
+              <NavigationMenuTrigger className={navigationMenuTriggerStyle()}>
+                Menu
+              </NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid w-[98vw] gap-3 p-4 sm:w-[26vw] sm:grid-cols-2">
+                  {components.map(
+                    (component) =>
+                      !isActive(component.group) && (
+                        <ListItem
+                          key={component.title}
+                          title={component.title}
+                          href={component.href}
+                        >
+                          {component.description}
+                        </ListItem>
+                      )
+                  )}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+          )}
           <NavigationMenuItem>
             <NavigationMenuLink asChild>
               <Link to="/report" className={navigationMenuTriggerStyle()}>
@@ -105,49 +109,65 @@ const Header = () => {
             </NavigationMenuLink>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Avatar>
-                  <AvatarImage src="#" />
-                  <AvatarFallback>?</AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="mx-2 sm:mr-6 dark:text-dark-text">
-                <DropdownMenuLabel>Sudah Punya Akun?</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={toggleLoginModal}
-                  className="hover:cursor-pointer dark:text-dark-link"
-                >
-                  Login
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={toggleSignupModal}
-                  className="hover:cursor-pointer dark:text-dark-link"
-                >
-                  Daftar
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            {isActive("apa") && (
+            {!user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Avatar>
-                    <AvatarImage src="https://github.com/shadcn.png" />
-                    <AvatarFallback>GB</AvatarFallback>
+                    <AvatarImage src="#" />
+                    <AvatarFallback>?</AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="mx-2 sm:mr-6 dark:text-dark-text">
-                  <DropdownMenuLabel>GalaxyBuilder-OSS</DropdownMenuLabel>
+                  <DropdownMenuLabel>Sudah Punya Akun?</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="hover:cursor-pointer dark:text-dark-link">
+                  <DropdownMenuItem
+                    onClick={toggleLoginModal}
+                    className="hover:cursor-pointer dark:text-dark-link"
+                  >
+                    Login
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={toggleSignupModal}
+                    className="hover:cursor-pointer dark:text-dark-link"
+                  >
+                    Daftar
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Avatar>
+                    <AvatarFallback>
+                      {user.name.includes(" ")
+                        ? user.name.charAt(0) +
+                          user.name.split(" ")[1].charAt(0)
+                        : user.name.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="mx-2 sm:mr-6 dark:text-dark-text">
+                  <DropdownMenuLabel>{user.name}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="hover:cursor-pointer dark:text-dark-link"
+                    asChild
+                  >
                     <Link to="/profile">Profil</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:cursor-pointer dark:text-dark-link">
+                  <DropdownMenuItem
+                    className="hover:cursor-pointer dark:text-dark-link"
+                    asChild
+                  >
                     <Link to="/profile">Pengaturan</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:cursor-pointer dark:text-dark-link">
-                    <Link to="/profile">Keluar</Link>
+                  <DropdownMenuItem
+                    className="hover:cursor-pointer dark:text-dark-link"
+                    asChild
+                  >
+                    <Link to="/" onClick={handleLogout}>
+                      Keluar
+                    </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -188,7 +208,7 @@ const ListItem = React.forwardRef<
           {...props}
         >
           <div className="text-sm font-semibold leading-none">{title}</div>
-          <p className="line-clamp-3 text-sm leading-snug text-dark-text font-normal">
+          <p className="line-clamp-3 text-sm leading-snug text-dark-text font-normal hidden lg:inline-block">
             {children}
           </p>
         </Link>

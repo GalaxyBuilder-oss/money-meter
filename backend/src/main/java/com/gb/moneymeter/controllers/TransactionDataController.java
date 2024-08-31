@@ -69,4 +69,21 @@ public class TransactionDataController {
             return ResponseEntity.internalServerError().body(GeneralResponses.error(MessagesConstant.INTERNAL_ERROR));
         }
     }
+
+    @SecurityRequirement(name = "Bearer Authentication")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> delete(@PathVariable Long id) {
+
+        try {
+
+            transactionDataService.delete(id);
+            return ResponseEntity.ok().body(GeneralResponses.success(null, "Success"));
+        } catch (ResponseStatusException e) {
+
+            return ResponseEntity.badRequest().body(GeneralResponses.error(e.getMessage()));
+        } catch (Error e) {
+            log.error(e.getMessage());
+            return ResponseEntity.internalServerError().body(GeneralResponses.error(MessagesConstant.INTERNAL_ERROR));
+        }
+    }
 }
