@@ -54,6 +54,7 @@ const TransactionPage = ({ defaultValue }: { defaultValue: string }) => {
     transactions,
     fetchTransactions,
     fetchCategories,
+    navigate,
   } = useAppContext();
 
   useEffect(() => {
@@ -97,7 +98,7 @@ const TransactionPage = ({ defaultValue }: { defaultValue: string }) => {
     await apiTransaction
       .add({ ...values, transactionValue: parsedValue, idUser })
       .then((res) => console.log(res));
-    form.reset()
+    form.reset();
   }
 
   function parseTransactionValue(value: string): number {
@@ -105,200 +106,211 @@ const TransactionPage = ({ defaultValue }: { defaultValue: string }) => {
     return isNaN(numericValue) ? 0 : numericValue;
   }
 
-  return (
-    <Tabs defaultValue={defaultValue} className="w-[80vw] flex flex-col">
-      <TabsList className="w-full flex justify-around">
-        <TabsTrigger value="create" asChild>
-          <Link to="/transaction/add">Tambah Transaksi</Link>
-        </TabsTrigger>
-        <TabsTrigger value="see">
-          <Link to="/transaction">Lihat Transaksi</Link>
-        </TabsTrigger>
-      </TabsList>
-      <TabsContent value="create" className="dark:text-dark-title">
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-8 min-w-40"
-          >
-            <FormField
-              control={form.control}
-              name="transactionValue"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nilai Transaksi</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      {...field}
-                      value={formatter.format(
-                        parseTransactionValue(field.value)
-                      )}
-                      minLength={minValue}
-                      maxLength={maxValue}
-                      onChange={(e) => {
-                        const rawValue = e.target.value;
-                        field.onChange(rawValue);
-                      }}
-                    />
-                  </FormControl>
-                  <FormDescription>Masukkan Nilai Transaksi</FormDescription>
-                  {formErrors.transactionValue && (
-                    <FormMessage>{formErrors.transactionValue}</FormMessage>
-                  )}
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Deskripsi</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Description of the transaction"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Berikan Keterangan Untuk Transaksi.
-                  </FormDescription>
-                  {formErrors.description && (
-                    <FormMessage>{formErrors.description}</FormMessage>
-                  )}
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="date"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tanggal</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Pilih Tanggal Transaksi Dilakukan
-                  </FormDescription>
-                  {formErrors.date && (
-                    <FormMessage>{formErrors.date}</FormMessage>
-                  )}
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="transactionType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tipe Transaksi</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      className="flex space-x-4"
-                    >
-                      <FormItem>
-                        <FormControl>
-                          <RadioGroupItem value="Debit" id="debit" />
-                        </FormControl>
-                        <FormLabel htmlFor="debit">Debit</FormLabel>
-                      </FormItem>
-                      <FormItem>
-                        <FormControl>
-                          <RadioGroupItem value="Credit" id="credit" />
-                        </FormControl>
-                        <FormLabel htmlFor="credit">Kredit</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                  {formErrors.transactionType && (
-                    <FormMessage>{formErrors.transactionType}</FormMessage>
-                  )}
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="idCategory"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Kategori Transaksi</FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={(value) => field.onChange(parseInt(value))}
-                      value={field.value?.toString() || ""}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories &&
-                          categories.map((category) => (
-                            <SelectItem
-                              key={category.id}
-                              value={category.id.toString()}
-                            >
-                              {category.name}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormDescription>
-                    Pilih Kategori/Akun Untuk Transaksi Ini
-                  </FormDescription>
-                  {formErrors.idCategory && (
-                    <FormMessage>{formErrors.idCategory}</FormMessage>
-                  )}
-                </FormItem>
-              )}
-            />
-            <Button type="submit">Submit</Button>
-          </form>
-        </Form>
-      </TabsContent>
-      <TabsContent value="see">
-        <Table className="capitalize dark:text-dark-title">
-          <TableHeader>
-            <TableRow>
-              <TableHead>NO</TableHead>
-              <TableHead>Keterangan</TableHead>
-              <TableHead>Nilai Transaksi</TableHead>
-              <TableHead>Tipe Transaksi</TableHead>
-              <TableHead>Kategori</TableHead>
-              <TableHead>Tanggal</TableHead>
-              <TableHead>Aksi</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {transactions &&
-              transactions.map((transaction: Transaction, i: number) => (
-                <TableRow key={transaction.id}>
-                  <TableCell>{i + 1}</TableCell>
-                  <TableCell>{transaction.description}</TableCell>
-                  <TableCell>
-                    {formatter.format(transaction.transactionValue)}
-                  </TableCell>
-                  <TableCell>{transaction.transactionType}</TableCell>
-                  <TableCell>{transaction.idCategory?.name}</TableCell>
-                  <TableCell>
-                    {new Date(transaction.date).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    <Button>
-                      <Trash2Icon />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </TabsContent>
-    </Tabs>
-  );
+  if (!user) navigate("/");
+  else
+    return (
+      <Tabs defaultValue={defaultValue} className="w-[80vw] flex flex-col">
+        <TabsList className="w-full flex justify-around">
+          <TabsTrigger value="create" asChild>
+            <Link to="/transaction/add">Tambah Transaksi</Link>
+          </TabsTrigger>
+          <TabsTrigger value="see">
+            <Link to="/transaction">Lihat Transaksi</Link>
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="create" className="dark:text-dark-title">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-8 min-w-40"
+            >
+              <FormField
+                control={form.control}
+                name="transactionValue"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nilai Transaksi</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        {...field}
+                        value={formatter.format(
+                          parseTransactionValue(field.value)
+                        )}
+                        minLength={minValue}
+                        maxLength={maxValue}
+                        onChange={(e) => {
+                          const rawValue = e.target.value;
+                          field.onChange(rawValue);
+                        }}
+                      />
+                    </FormControl>
+                    <FormDescription>Masukkan Nilai Transaksi</FormDescription>
+                    {formErrors.transactionValue && (
+                      <FormMessage>{formErrors.transactionValue}</FormMessage>
+                    )}
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Deskripsi</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Description of the transaction"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Berikan Keterangan Untuk Transaksi.
+                    </FormDescription>
+                    {formErrors.description && (
+                      <FormMessage>{formErrors.description}</FormMessage>
+                    )}
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tanggal</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Pilih Tanggal Transaksi Dilakukan
+                    </FormDescription>
+                    {formErrors.date && (
+                      <FormMessage>{formErrors.date}</FormMessage>
+                    )}
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="transactionType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipe Transaksi</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        className="flex space-x-4"
+                      >
+                        <FormItem>
+                          <FormControl>
+                            <RadioGroupItem value="Debit" id="debit" />
+                          </FormControl>
+                          <FormLabel htmlFor="debit">Debit</FormLabel>
+                        </FormItem>
+                        <FormItem>
+                          <FormControl>
+                            <RadioGroupItem value="Credit" id="credit" />
+                          </FormControl>
+                          <FormLabel htmlFor="credit">Kredit</FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                    {formErrors.transactionType && (
+                      <FormMessage>{formErrors.transactionType}</FormMessage>
+                    )}
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="idCategory"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Kategori Transaksi</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={(value) =>
+                          field.onChange(parseInt(value))
+                        }
+                        value={field.value?.toString() || ""}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories &&
+                            categories.map((category) => (
+                              <SelectItem
+                                key={category.id}
+                                value={category.id.toString()}
+                              >
+                                {category.name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormDescription>
+                      Pilih Kategori/Akun Untuk Transaksi Ini
+                    </FormDescription>
+                    {formErrors.idCategory && (
+                      <FormMessage>{formErrors.idCategory}</FormMessage>
+                    )}
+                  </FormItem>
+                )}
+              />
+              <Button type="submit">Submit</Button>
+            </form>
+          </Form>
+        </TabsContent>
+        <TabsContent value="see">
+          <Table className="capitalize dark:text-dark-title">
+            <TableHeader>
+              <TableRow>
+                <TableHead>NO</TableHead>
+                <TableHead>Keterangan</TableHead>
+                <TableHead>Nilai Transaksi</TableHead>
+                <TableHead>Tipe Transaksi</TableHead>
+                <TableHead>Kategori</TableHead>
+                <TableHead>Tanggal</TableHead>
+                <TableHead>Aksi</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {transactions &&
+                transactions.map((transaction: Transaction, i: number) => (
+                  <TableRow key={transaction.id}>
+                    <TableCell>{i + 1}</TableCell>
+                    <TableCell>{transaction.description}</TableCell>
+                    <TableCell>
+                      {formatter.format(transaction.transactionValue)}
+                    </TableCell>
+                    <TableCell>{transaction.transactionType}</TableCell>
+                    <TableCell>{transaction.idCategory?.name}</TableCell>
+                    <TableCell>
+                      {new Date(transaction.date).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        onClick={() =>
+                          apiTransaction.delete(transaction.id).then((res) => {
+                            console.log(res);
+                            fetchTransactions();
+                          })
+                        }
+                      >
+                        <Trash2Icon />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TabsContent>
+      </Tabs>
+    );
 };
 
 export default TransactionPage;

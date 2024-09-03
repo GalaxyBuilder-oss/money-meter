@@ -71,43 +71,45 @@ const Header = () => {
       </h1>
       <NavigationMenu>
         <NavigationMenuList className="gap-2 justify-between">
-          <NavigationMenuItem>
+          {user && (<NavigationMenuItem>
             <NavigationMenuLink asChild>
-              <Link to="/" className={navigationMenuTriggerStyle()}>
+              <Link to="/dashboard" className={navigationMenuTriggerStyle()}>
                 Dashboard
               </Link>
             </NavigationMenuLink>
-          </NavigationMenuItem>
+          </NavigationMenuItem>)}
           {user && (
-            <NavigationMenuItem>
-              <NavigationMenuTrigger className={navigationMenuTriggerStyle()}>
-                Menu
-              </NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid w-[98vw] gap-3 p-4 sm:w-[26vw] sm:grid-cols-2">
-                  {components.map(
-                    (component) =>
-                      !isActive(component.group) && (
-                        <ListItem
-                          key={component.title}
-                          title={component.title}
-                          href={component.href}
-                        >
-                          {component.description}
-                        </ListItem>
-                      )
-                  )}
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
+            <>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className={navigationMenuTriggerStyle()}>
+                  Menu
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-[98vw] gap-3 p-4 sm:w-[26vw] sm:grid-cols-2">
+                    {components.map(
+                      (component) =>
+                        !isActive(component.group) && (
+                          <ListItem
+                            key={component.title}
+                            title={component.title}
+                            href={component.href}
+                          >
+                            {component.description}
+                          </ListItem>
+                        )
+                    )}
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link to="/report" className={navigationMenuTriggerStyle()}>
+                    Laporan
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            </>
           )}
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <Link to="/report" className={navigationMenuTriggerStyle()}>
-                Laporan
-              </Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
           <NavigationMenuItem>
             {!user ? (
               <DropdownMenu>
@@ -154,12 +156,6 @@ const Header = () => {
                     asChild
                   >
                     <Link to="/profile">Profil</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="hover:cursor-pointer dark:text-dark-link"
-                    asChild
-                  >
-                    <Link to="/profile">Pengaturan</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="hover:cursor-pointer dark:text-dark-link"

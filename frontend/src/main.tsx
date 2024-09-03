@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App.tsx";
 import "./index.css";
-import { CategoryPage, Home, Profile, ReportPage, Tests, TransactionPage } from "./pages";
+import { CategoryPage, Home, HomeGuest, Profile, ReportPage, TransactionPage } from "./pages";
 
 const router = createBrowserRouter([
   {
@@ -12,6 +12,10 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
+        element: <HomeGuest />,
+      },
+      {
+        path: "/dashboard",
         element: <Home />,
       },
       {
@@ -37,10 +41,6 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <Profile />,
-      },
-      {
-        path: "/tes",
-        element: <Tests />,
       },
     ],
   },

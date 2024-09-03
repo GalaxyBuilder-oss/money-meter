@@ -29,7 +29,7 @@ type FormValues = {
 };
 
 const CategoryPage = ({ defaultValue }: { defaultValue: string }) => {
-  const { user, categories, fetchCategories } = useAppContext();
+  const { user, categories, fetchCategories, navigate } = useAppContext();
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [editingCategory, setEditingCategory] = useState<number | null>(null);
 
@@ -93,93 +93,101 @@ const CategoryPage = ({ defaultValue }: { defaultValue: string }) => {
     fetchCategories(); // Refresh categories after submit
   }
 
-  return (
-    <Tabs defaultValue={defaultValue} className="w-[400px] flex flex-col">
-      <TabsList className="w-full flex justify-around">
-        <TabsTrigger value="create" asChild>
-          <Link to="/category/add">
-            {editingCategory ? "Edit" : "Tambah"} Kategori
-          </Link>
-        </TabsTrigger>
-        <TabsTrigger value="see">
-          <Link to="/category">Lihat Kategori</Link>
-        </TabsTrigger>
-      </TabsList>
-      <TabsContent value="create">
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-8 min-w-40"
-          >
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nama</FormLabel>
-                  <FormControl>
-                    <Input type="text" {...field} placeholder="Nama Kategori" />
-                  </FormControl>
-                  <FormDescription>Masukkan Nama Kategori</FormDescription>
-                  {formErrors.name && (
-                    <FormMessage>{formErrors.name}</FormMessage>
-                  )}
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Deskripsi</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Deskripsi Kategori" {...field} />
-                  </FormControl>
-                  <FormDescription>Masukkan Deskripsi Kategori</FormDescription>
-                  {formErrors.description && (
-                    <FormMessage>{formErrors.description}</FormMessage>
-                  )}
-                </FormItem>
-              )}
-            />
-            <Button type="submit">
-              {editingCategory ? "Update Kategori" : "Submit"}
-            </Button>
-          </form>
-        </Form>
-      </TabsContent>
-      <TabsContent value="see" className="p-4">
-        <ul className="flex flex-col list-decimal gap-3">
-          {categories &&
-            categories
-              .sort((a, b) => a.name.localeCompare(b.name))
-              .map((category, i) => (
-                <li key={category.id} className="flex justify-between">
-                  {i + 1}. {category.name}{" "}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className="border rounded-full p-2">
-                      Pilih Opsi
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem
-                        onClick={() => handleDelete(category?.id)}
-                      >
-                        Hapus
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleEdit(category?.id)}
-                      >
-                        Update
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </li>
-              ))}
-        </ul>
-      </TabsContent>
-    </Tabs>
-  );
+  if (!user) navigate("/");
+  else
+    return (
+      <Tabs defaultValue={defaultValue} className="w-[400px] flex flex-col">
+        <TabsList className="w-full flex justify-around">
+          <TabsTrigger value="create" asChild>
+            <Link to="/category/add">
+              {editingCategory ? "Edit" : "Tambah"} Kategori
+            </Link>
+          </TabsTrigger>
+          <TabsTrigger value="see">
+            <Link to="/category">Lihat Kategori</Link>
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="create">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-8 min-w-40"
+            >
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nama</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        {...field}
+                        placeholder="Nama Kategori"
+                      />
+                    </FormControl>
+                    <FormDescription>Masukkan Nama Kategori</FormDescription>
+                    {formErrors.name && (
+                      <FormMessage>{formErrors.name}</FormMessage>
+                    )}
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Deskripsi</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Deskripsi Kategori" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Masukkan Deskripsi Kategori
+                    </FormDescription>
+                    {formErrors.description && (
+                      <FormMessage>{formErrors.description}</FormMessage>
+                    )}
+                  </FormItem>
+                )}
+              />
+              <Button type="submit">
+                {editingCategory ? "Update Kategori" : "Submit"}
+              </Button>
+            </form>
+          </Form>
+        </TabsContent>
+        <TabsContent value="see" className="p-4">
+          <ul className="flex flex-col list-decimal gap-3">
+            {categories &&
+              categories
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((category, i) => (
+                  <li key={category.id} className="flex justify-between">
+                    {i + 1}. {category.name}{" "}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger className="border rounded-full p-2">
+                        Pilih Opsi
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem
+                          onClick={() => handleDelete(category?.id)}
+                        >
+                          Hapus
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleEdit(category?.id)}
+                        >
+                          Update
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </li>
+                ))}
+          </ul>
+        </TabsContent>
+      </Tabs>
+    );
 };
 
 export default CategoryPage;

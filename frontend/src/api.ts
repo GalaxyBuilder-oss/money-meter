@@ -92,8 +92,8 @@ const funcUpdateTransaction = async (id: number, req: UserDto) => {
 };
 
 const funcDeleteTransaction = async (id: number) => {
-  // const res = await axiosInstance.put(`/transaction/${id}`, req);
-  return id;
+  const res = await axiosInstance.delete(`/transaction/${id}`);
+  return res;
 };
 
 export const apiTransaction = {

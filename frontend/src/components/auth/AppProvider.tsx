@@ -3,7 +3,7 @@ import { Category, Transaction, User } from "@/types";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { createContext, ReactNode, useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { NavigateFunction, useNavigate } from "react-router-dom";
 
 export interface AppContextType {
   hashEmail: string | null;
@@ -16,6 +16,7 @@ export interface AppContextType {
   fetchCategories: () => void;
   transactions?: Transaction[];
   fetchTransactions: () => void;
+  navigate: NavigateFunction;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -90,6 +91,7 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
         fetchCategories,
         transactions,
         fetchTransactions,
+        navigate
       }}
     >
       {children}

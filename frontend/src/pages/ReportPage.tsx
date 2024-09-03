@@ -10,11 +10,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Transaction } from "@/types";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import { useEffect, useState } from "react";
 
 const ReportPage = () => {
-  const { transactions, fetchTransactions, categories, fetchCategories, formatter } =
-    useAppContext();
+  const {
+    transactions,
+    fetchTransactions,
+    categories,
+    fetchCategories,
+    formatter
+  } = useAppContext();
   const [filteredTransactions, setFilteredTransactions] = useState<
     Transaction[]
   >([]);
@@ -72,7 +79,17 @@ const ReportPage = () => {
   }, [transactions, category, transactionType, dateRange, search]);
 
   const handleExport = () => {
-    // Implement export functionality (e.g., to CSV or PDF)
+    const pdf = new jsPDF({
+      orientation: "landscape",
+    });
+    autoTable(pdf, {
+      html: "#report-table",
+      theme: "striped",
+    });
+
+    const date = Date().split(" ");
+    const dateStr = `${date[0]}_${date[1]}_${date[2]}_${date[3]}`;
+    pdf.save(`Laporan Transaksi_${dateStr}.pdf`);
   };
 
   return (
@@ -130,14 +147,14 @@ const ReportPage = () => {
         </div>
 
         <div className="mt-4">
-          <table className="min-w-full divide-y divide-gray-200 dark:text-dark-title dark:bg-dark-bg">
+          <table className="min-w-full divide-y divide-gray-200 dark:text-dark-title dark:bg-dark-bg" id="report-table">
             <thead>
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase">
                   Tanggal
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase">
-                  Deskripsi
+                  Keterangan
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase">
                   Kategori
@@ -150,7 +167,7 @@ const ReportPage = () => {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-200 capitalize">
               {filteredTransactions &&
                 filteredTransactions.map((transaction) => (
                   <tr key={transaction.id}>

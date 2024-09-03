@@ -7,12 +7,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useEffect, useState } from "react";
 
 const Profile = () => {
-  const { user, userData } = useAppContext();
-  userData();
+  const { user, userData, navigate } = useAppContext();
+  const [loading, setLoading] = useState<boolean>(false);
+  useEffect(() => {
+    setLoading(true);
+    userData();
+    setLoading(false);
+  }, [userData]);
 
-  if (!user) {
+  if (!user) navigate("/");
+  else if (loading) {
     return (
       <Card className="w-[90vw] p-4 bg-white shadow-md rounded-lg">
         <CardHeader>

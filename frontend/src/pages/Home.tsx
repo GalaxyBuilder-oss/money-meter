@@ -300,7 +300,7 @@ const Home = () => {
               <CardTitle>Total Transaksi</CardTitle>
               <CardDescription>-</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 pb-0">
+            <CardContent className="flex-1 p-4">
               {isLoading ? (
                 <Skeleton className="aspect-auto h-[250px] w-full rounded-lg" />
               ) : (
@@ -356,7 +356,7 @@ const Home = () => {
             </CardContent>
             <CardFooter className="flex-col gap-2 text-sm">
               <div className="leading-none text-muted-foreground">
-                Menampilkan Jumlah Transaksi Yang Telah Di Catat
+                Menampilkan Total Transaksi Yang Telah Di Catat
               </div>
             </CardFooter>
           </Card>
@@ -368,7 +368,7 @@ const Home = () => {
               <CardTitle>Jumlah Transaksi</CardTitle>
               <CardDescription>-</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 pb-0">
+            <CardContent className="flex-1 p-4">
               {isLoading ? (
                 <Skeleton className="aspect-auto h-[250px] w-full rounded-lg" />
               ) : (
@@ -441,7 +441,7 @@ const Home = () => {
                 </CardDescription>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4">
               {isLoading ? (
                 <Skeleton className="aspect-auto h-[250px] w-full rounded-lg" />
               ) : (
@@ -484,13 +484,13 @@ const Home = () => {
           <Card>
             <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
               <div className="w-[20vw] grid flex-1 gap-1 text-center sm:text-left">
-                <CardTitle>Kredit</CardTitle>
+                <CardTitle>Debit</CardTitle>
                 <CardDescription>
-                  Menampilkan Total Transaksi Kredit
+                  Menampilkan Total Transaksi Debit
                 </CardDescription>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4">
               {isLoading ? (
                 <Skeleton className="aspect-auto h-[250px] w-full rounded-lg" />
               ) : (

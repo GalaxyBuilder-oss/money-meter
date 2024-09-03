@@ -23,26 +23,6 @@ const Footer = () => {
           <InstagramIcon className="h-6 w-6" />
         </Link>
       </div>
-      <div className="flex justify-center space-x-4">
-        <Link
-          to="#"
-          className="text-sm text-light-text dark:text-dark-text dark:hover:text-dark-link"
-        >
-          About Us
-        </Link>
-        <Link
-          to="#"
-          className="text-sm text-light-text dark:text-dark-text dark:hover:text-dark-link"
-        >
-          Contact
-        </Link>
-        <Link
-          to="#"
-          className="text-sm text-light-text dark:text-dark-text dark:hover:text-dark-link"
-        >
-          Careers
-        </Link>
-      </div>
       <p className="text-xs text-light-text dark:text-dark-text">
         &copy; {new Date().getFullYear()} - React Fundamental Project
       </p>
