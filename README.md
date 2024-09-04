@@ -12,7 +12,7 @@ Pelaporan keuangan yang lengkap dan akurat
 Analisis data yang mendalam dengan berbagai macam grafik
 
 ## Entity Relationship Diagram (ERD)
-![ERD](/public/image.png)
+![ERD](/image.png)
 
 ## Tech Stack
  - Frontend : [ReactJs](https://react.dev), [Tailwindcss](https://tailwindcss.com), [Shadcn UI](https://ui.shadcn.com/)
