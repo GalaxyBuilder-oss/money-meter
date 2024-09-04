@@ -14,7 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Tag(name = "Transaction")
 @Slf4j
-@CrossOrigin(origins = {"http://localhost:5173","http://money-meter.vercel.app"})
+@CrossOrigin(origins = {"http://localhost:5173","http://money-meter.vercel.app", "https://money-meter.vercel.app"})
 @RestController
 @RequestMapping("/api/transaction")
 public class TransactionDataController {

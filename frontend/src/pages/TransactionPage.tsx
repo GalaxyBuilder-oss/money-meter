@@ -45,8 +45,10 @@ type FormValues = {
 
 const TransactionPage = ({ defaultValue }: { defaultValue: string }) => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-  const [minValue, setMinValue] = useState<number>(0);
-  const [maxValue, setMaxValue] = useState<number>(0);
+  const [minValue, setMinValue] = useState(0);
+  const [maxValue, setMaxValue] = useState(0);
+  const [isDelete, setIsDelete] = useState(false);
+
   const {
     user,
     formatter,
@@ -99,6 +101,7 @@ const TransactionPage = ({ defaultValue }: { defaultValue: string }) => {
       .add({ ...values, transactionValue: parsedValue, idUser })
       .then((res) => console.log(res));
     form.reset();
+    fetchTransactions();
   }
 
   function parseTransactionValue(value: string): number {
@@ -296,10 +299,14 @@ const TransactionPage = ({ defaultValue }: { defaultValue: string }) => {
                       <Button
                         onClick={() =>
                           apiTransaction.delete(transaction.id).then((res) => {
+                            setIsDelete(true);
                             console.log(res);
                             fetchTransactions();
+                            setIsDelete(false);
                           })
                         }
+                        className={isDelete ? "cursor-progress" : "cursor-pointer"}
+                        disabled={isDelete}
                       >
                         <Trash2Icon />
                       </Button>

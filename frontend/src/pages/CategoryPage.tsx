@@ -35,7 +35,7 @@ const CategoryPage = ({ defaultValue }: { defaultValue: string }) => {
 
   const handleDelete = async (id: number) => {
     await apiCategory.delete(id).then((res) => console.log(res));
-    fetchCategories(); // Refresh categories after delete
+    fetchCategories();
   };
 
   const handleEdit = (id: number) => {
@@ -77,20 +77,18 @@ const CategoryPage = ({ defaultValue }: { defaultValue: string }) => {
     const userId = user?.id as number;
 
     if (editingCategory) {
-      // Update existing category
       await apiCategory
         .update(editingCategory, { ...values, userId })
         .then((res) => console.log(res));
-      setEditingCategory(null); // Reset after editing
+      setEditingCategory(null);
     } else {
-      // Add new category
       await apiCategory
         .add({ ...values, userId })
         .then((res) => console.log(res));
     }
 
     form.reset();
-    fetchCategories(); // Refresh categories after submit
+    fetchCategories();
   }
 
   if (!user) navigate("/");
