@@ -22,8 +22,6 @@ public class Swagger {
         List<Server> server = new ArrayList<>();
         server.add(new Server().url("http://localhost:8080")
                 .description("Offline Server"));
-        server.add(new Server().url("http://54.251.134.88")
-                .description("Online Server"));
 
         Contact contact = new Contact()
                 .email("galaxybuilder.oss@gmail.com")

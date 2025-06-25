@@ -9,7 +9,6 @@ import com.gb.moneymeter.entities.UserData;
 import com.gb.moneymeter.repositories.CategoryRepository;
 import com.gb.moneymeter.repositories.TransactionDataRepository;
 import com.gb.moneymeter.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,14 +18,14 @@ import java.util.List;
 @Service
 public class TransactionDataServiceImpl implements TransactionDataService {
 
-    @Autowired
     private TransactionDataRepository transactionRepository;
-
-    @Autowired
-    private CategoryRepository categoryRepository;
-
-    @Autowired
     private UserRepository userRepository;
+
+    public TransactionDataServiceImpl(TransactionDataRepository transactionRepository,
+            UserRepository userRepository) {
+        this.transactionRepository = transactionRepository;
+        this.userRepository = userRepository;
+    }
 
     @Override
     public List<TransactionDataResponseDto> getAll() {
