@@ -16,25 +16,24 @@ RUN apk add --no-cache maven
 COPY backend/pom.xml ./
 COPY backend/src ./src
 
-# Jalankan menggunakan mvn global, bukan ./mvnw
+# Jalankan menggunakan mvn global
 RUN mvn clean package -DskipTests
 
 # --- Stage 3: Final Production Image ---
 FROM eclipse-temurin:21-jre-alpine
 
-# Install Nginx dan Supervisor untuk menjalankan 2 proses (Nginx & Java) dalam 1 container
+# Install Nginx dan Supervisor
 RUN apk add --no-cache nginx supervisor
 
-# 1. Setup Nginx untuk Frontend
-WORKDIR /usr/share/nginx/html
-COPY --from=frontend-build /app/frontend/dist /usr/share/nginx/html
+# 1. Salin hasil build Vite (Frontend) ke direktori root web default Nginx di Alpine
+COPY --from=frontend-build /app/frontend/dist /var/www/localhost/htdocs
 
-# Hanya ekspos port frontend (Nginx)
-EXPOSE 80
-
-# 2. Setup Backend JAR dari Stage 2
+# 2. Salin backend JAR ke folder /app
 WORKDIR /app
 COPY --from=backend-build /app/backend/target/*.jar app.jar
+
+# Hanya ekspos port frontend (Nginx) ke luar
+EXPOSE 80
 
 # 3. Setup Supervisor Configuration untuk menjalankan Nginx dan Java Spring Boot bersamaan
 RUN mkdir -p /etc/supervisor.d/
@@ -61,5 +60,5 @@ stdout_logfile=/dev/stdout
 stdout_logfile_maxbytes=0
 EOF
 
-# Jalankan supervisor untuk menghidupkan Nginx dan Spring Boot sekaligus
+# Jalankan supervisor sebagai entrypoint utama
 ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor.d/conf.ini"]
