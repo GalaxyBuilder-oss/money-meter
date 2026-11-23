@@ -45,6 +45,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ./Dockerfile  # <-- Ditambahkan agar mendeteksi Dockerfile di root folder
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          labels: ${{ steps.meta-backend.outputs.labels }} # Opsional, bisa disesuaikan jadi ${{ steps.meta.outputs.labels }}
