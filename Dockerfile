@@ -1,5 +1,5 @@
 # --- Stage 1: Build Frontend (Vite) ---
-FROM node:26-alpine AS frontend-build
+FROM node:20-alpine AS frontend-build
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm install
@@ -7,9 +7,8 @@ COPY frontend/ ./
 RUN npm run build
 
 # --- Stage 2: Build Backend (Java 21 + Maven) ---
-FROM eclipse-temurin:21-jdk-alpine AS backend-build
+FROM maven:3.9-eclipse-temurin-21-alpine AS backend-build
 WORKDIR /app/backend
-RUN apk add --no-cache maven
 COPY backend/pom.xml ./
 COPY backend/src ./src
 RUN mvn clean package -DskipTests
@@ -17,12 +16,12 @@ RUN mvn clean package -DskipTests
 # --- Stage 3: Final Production Image ---
 FROM eclipse-temurin:21-jre-alpine
 
-# Install Nginx dan Supervisor
-RUN apk add --no-cache nginx supervisor
+# Install Nginx, Supervisor, dan buat direktori run Nginx
+RUN apk add --no-cache nginx supervisor && \
+    mkdir -p /run/nginx /etc/nginx/conf.d/
 
-# 1. Buat custom konfigurasi Nginx agar langsung mengarah ke file build Vite & Proxy API ke Backend
-RUN mkdir -p /etc/nginx/http.d/
-COPY <<EOF /etc/nginx/http.d/default.conf
+# 1. Konfigurasi Nginx
+COPY <<EOF /etc/nginx/conf.d/default.conf
 server {
     listen 80;
     server_name localhost;
@@ -30,12 +29,10 @@ server {
     root /var/www/localhost/htdocs;
     index index.html index.htm;
 
-    # Supaya SPA (Single Page Application seperti Vite/React Router) tidak 404 saat refresh
     location / {
         try_files \$uri \$uri/ /index.html;
     }
 
-    # (Opsional) Jika ingin meneruskan request /api ke Spring Boot di port 8080
     location /api {
         proxy_pass http://127.0.0.1:8080;
         proxy_set_header Host \$host;
@@ -54,7 +51,6 @@ COPY --from=backend-build /app/backend/target/*.jar app.jar
 EXPOSE 80
 
 # 4. Supervisor config
-RUN mkdir -p /etc/supervisor.d/
 COPY <<EOF /etc/supervisor.d/conf.ini
 [supervisord]
 nodaemon=true
