@@ -12,6 +12,10 @@ WORKDIR /app/backend
 COPY backend/mvnw backend/pom.xml ./
 COPY backend/.mvn .mvn
 COPY backend/src ./src
+
+# Berikan izin eksekusi pada file mvnw
+RUN chmod +x ./mvnw
+
 RUN ./mvnw clean package -DskipTests
 
 # --- Stage 3: Final Production Image ---
