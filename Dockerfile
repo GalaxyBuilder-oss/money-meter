@@ -2,21 +2,22 @@
 FROM node:26-alpine AS frontend-build
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
-RUN npm ci
+RUN npm install
 COPY frontend/ ./
 RUN npm run build
 
 # --- Stage 2: Build Backend (Java 21 + Maven) ---
 FROM eclipse-temurin:21-jdk-alpine AS backend-build
 WORKDIR /app/backend
-COPY backend/mvnw backend/pom.xml ./
-COPY backend/.mvn .mvn
+
+# Install Maven secara langsung via apk
+RUN apk add --no-cache maven
+
+COPY backend/pom.xml ./
 COPY backend/src ./src
 
-# Berikan izin eksekusi pada file mvnw
-RUN chmod +x ./mvnw
-
-RUN ./mvnw clean package -DskipTests
+# Jalankan menggunakan mvn global, bukan ./mvnw
+RUN mvn clean package -DskipTests
 
 # --- Stage 3: Final Production Image ---
 FROM eclipse-temurin:21-jre-alpine
