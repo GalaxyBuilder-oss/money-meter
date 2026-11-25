@@ -18,25 +18,41 @@ FROM eclipse-temurin:21-jre-alpine
 
 # Install Nginx, Supervisor, dan curl
 RUN apk add --no-cache nginx supervisor curl && \
-    mkdir -p /run/nginx /etc/nginx/conf.d/ /var/log/supervisor
+    mkdir -p /run/nginx /var/log/supervisor
 
-# 1. Konfigurasi Nginx (Langsung blok server tanpa membungkus http)
-COPY <<EOF /etc/nginx/conf.d/default.conf
-server {
-    listen 80;
-    server_name localhost;
+# 1. Timpa langsung /etc/nginx/nginx.conf dengan konfigurasi lengkap yang bersih
+COPY <<EOF /etc/nginx/nginx.conf
+user root;
+worker_processes auto;
+error_log /var/log/nginx/error.log warn;
+pid /run/nginx/nginx.pid;
 
-    root /var/www/localhost/htdocs;
-    index index.html index.htm;
+events {
+    worker_connections 1024;
+}
 
-    location / {
-        try_files \$uri \$uri/ /index.html;
-    }
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
 
-    location /api {
-        proxy_pass http://127.0.0.1:8080;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
+    access_log /var/log/nginx/access.log;
+
+    server {
+        listen 80;
+        server_name localhost;
+
+        root /var/www/localhost/htdocs;
+        index index.html index.htm;
+
+        location / {
+            try_files \$uri \$uri/ /index.html;
+        }
+
+        location /api {
+            proxy_pass http://127.0.0.1:8080;
+            proxy_set_header Host \$host;
+            proxy_set_header X-Real-IP \$remote_addr;
+        }
     }
 }
 EOF
