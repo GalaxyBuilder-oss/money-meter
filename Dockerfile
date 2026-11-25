@@ -20,28 +20,23 @@ FROM eclipse-temurin:21-jre-alpine
 RUN apk add --no-cache nginx supervisor curl && \
     mkdir -p /run/nginx /etc/nginx/conf.d/ /var/log/supervisor
 
-# 1. Konfigurasi Nginx (Tanpa blok events agar tidak duplikat)
+# 1. Konfigurasi Nginx (Langsung blok server tanpa membungkus http)
 COPY <<EOF /etc/nginx/conf.d/default.conf
-http {
-    include       /etc/nginx/mime.types;
-    default_type  application/octet-stream;
+server {
+    listen 80;
+    server_name localhost;
 
-    server {
-        listen 80;
-        server_name localhost;
+    root /var/www/localhost/htdocs;
+    index index.html index.htm;
 
-        root /var/www/localhost/htdocs;
-        index index.html index.htm;
+    location / {
+        try_files \$uri \$uri/ /index.html;
+    }
 
-        location / {
-            try_files \$uri \$uri/ /index.html;
-        }
-
-        location /api {
-            proxy_pass http://127.0.0.1:8080;
-            proxy_set_header Host \$host;
-            proxy_set_header X-Real-IP \$remote_addr;
-        }
+    location /api {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
     }
 }
 EOF
