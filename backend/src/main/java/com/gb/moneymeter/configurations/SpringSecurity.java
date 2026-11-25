@@ -52,7 +52,12 @@ public class SpringSecurity {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:5173"));
+        // Tambahkan domain production/Nginx dan juga localhost dev Anda
+        configuration.setAllowedOrigins(Arrays.asList(
+            "http://localhost:5173", // Untuk local development (Vite dev server)
+            "http://localhost",      // Untuk production di dalam Docker (Nginx port 80)
+            "http://localhost:80"    // Alternatif port 80
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
