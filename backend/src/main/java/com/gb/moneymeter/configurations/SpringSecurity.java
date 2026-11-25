@@ -56,7 +56,8 @@ public class SpringSecurity {
         configuration.setAllowedOrigins(Arrays.asList(
             "http://localhost:5173", // Untuk local development (Vite dev server)
             "http://localhost",      // Untuk production di dalam Docker (Nginx port 80)
-            "http://localhost:80"    // Alternatif port 80
+            "http://localhost:80",    // Alternatif port 80
+            "https://money-meter-dev.gbuilder.my.id"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
