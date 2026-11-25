@@ -16,11 +16,11 @@ RUN mvn clean package -DskipTests
 # --- Stage 3: Final Production Image ---
 FROM eclipse-temurin:21-jre-alpine
 
-# Install Nginx, Supervisor, dan alat uji ringan (curl)
+# Install Nginx, Supervisor, dan curl
 RUN apk add --no-cache nginx supervisor curl && \
     mkdir -p /run/nginx /etc/nginx/conf.d/ /var/log/supervisor
 
-# 1. Konfigurasi Nginx (Dibungkus dalam blok http)
+# 1. Konfigurasi Nginx (Tanpa blok events agar tidak duplikat)
 COPY <<EOF /etc/nginx/conf.d/default.conf
 http {
     include       /etc/nginx/mime.types;
@@ -44,10 +44,6 @@ http {
         }
     }
 }
-
-events {
-    worker_connections  1024;
-}
 EOF
 
 # 2. Salin hasil build Vite ke root Nginx
@@ -59,7 +55,7 @@ COPY --from=backend-build /app/backend/target/*.jar app.jar
 
 EXPOSE 80
 
-# 4. Supervisor config (Lengkap dengan unix_http_server & supervisorctl)
+# 4. Supervisor config
 COPY <<EOF /etc/supervisor.d/conf.ini
 [unix_http_server]
 file=/run/supervisord.sock
