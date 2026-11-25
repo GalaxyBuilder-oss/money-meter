@@ -20,6 +20,8 @@ FROM eclipse-temurin:21-jre-alpine
 RUN apk add --no-cache nginx supervisor && \
     mkdir -p /run/nginx /etc/nginx/conf.d/
 
+RUN apk --no-cache add curl
+
 # 1. Konfigurasi Nginx
 COPY <<EOF /etc/nginx/conf.d/default.conf
 server {
